@@ -1,7 +1,59 @@
 import React from 'react';
+import { connect } from 'react-redux';
+import flv from 'flv.js';
+import { fetchStream } from '../../actions';
 
-const StreamShow = () => {
-	return <div>StreamShow</div>;
+class StreamShow extends React.Component {
+	constructor(props) {
+		super(props);
+		this.videoRef = React.createRef();
+	}
+
+	componentDidMount() {
+		this.props.fetchStream(this.props.match.params.id);
+		this.buildPlayer();
+	}
+
+	componentDidUpdate() {
+		this.buildPlayer();
+	}
+
+	buildPlayer() {
+		if (this.player || !this.props.stream) {
+			return;
+		}
+		const id = this.props.match.params.id;
+		this.player = flv.createPlayer({
+			type: 'flv',
+			url: `http://127.0.0.1:8000/live/${id}.flv`
+		});
+		this.player.attachMediaElement(this.videoRef.current);
+		this.player.load();
+	}
+
+	componentWillUnmount() {
+		this.player.destroy();
+	}
+
+	render() {
+		if (!this.props.stream) {
+			return <div>Loading...</div>;
+		}
+		const { title, description } = this.props.stream;
+		return (
+			<div>
+				<div>
+					<video ref={this.videoRef} controls style={{ width: '100%' }} />
+					<h1>{title}</h1>
+					<h5>{description}</h5>
+				</div>
+			</div>
+		);
+	}
+}
+
+const mapStateToProps = (state, ownProps) => {
+	return { stream: state.streams[ownProps.match.params.id] };
 };
 
-export default StreamShow;
+export default connect(mapStateToProps, { fetchStream })(StreamShow);
