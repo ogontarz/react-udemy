@@ -1,1 +1,1 @@
-Simple apps created during Udemy Modern React with Redux [2020] class by Stephen Grider.
+Example apps created during taking [Udemy Modern React with Redux [2020]](https://www.udemy.com/course/react-redux/) class by Stephen Grider.
